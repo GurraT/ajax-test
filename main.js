@@ -2,7 +2,7 @@
 
 const baseURL = "https://ci-swapi.herokuapp.com/api/";
   
-function getData(type, cb) {
+function getData(url, cb) {
 
 //request method //
 var xhr = new XMLHttpRequest();
@@ -10,7 +10,10 @@ var xhr = new XMLHttpRequest();
 
 //get info from adress//
 
-xhr.open("GET", baseURL + type + "/");
+//xhr.open("GET", baseURL + type + "/");
+
+xhr.open("GET", url);
+
 
 //send info data//
 
@@ -56,22 +59,52 @@ function getTableHeaders(obj) {
     return `<tr>${tableHeaders}</tr>`;
 }
 
-function writeToDocument(type){
-    
-     var el = document.getElementById("data");
+function generatePaginationButtons(next, prev) {
+    if (next && prev) {
+        return `<button onclick="writeToDocument('${prev}')">Previous</button>
+                <button onclick="writeToDocument('${next}')">Next</button>`;
+    } else if (next && !prev) {
+        return `<button onclick="writeToDocument('${next}')">Next</button>`;
+    } else if (!next && prev) {
+        return `<button onclick="writeToDocument('${prev}')">Previous</button>`;
+    }
+}
+
+//function writeToDocument(type){
+    function writeToDocument(url){
+      var el = document.getElementById("data");
          el.innerHTML = "";
 
-    getData(type, function(data){
+    //getData(type, function(data){
+        getData(url, function(data){
         //console.dir(data);
+           var tableRows= [];
+          var pagination = "";
+
+        if (data.next || data.previous) {
+            pagination = generatePaginationButtons(data.next, data.previous);
+        }
         data =  data.results;
          var tableHeaders = getTableHeaders(data[0]);
 
         data.forEach(function(item){
-            el.innerHTML = `<table>${tableHeaders}</table>`;
+            var dataRow=[];
+
+            Object.keys(item).forEach(function(key){
+                var rowData=item[key].toString();
+                var trunctatedData = rowData.substring(0,15)
+                //dataRow.push(`<td>${item[key]}</td>`);
+                dataRow.push(`<td>${trunctatedData}</td>`);
+            });
+
+            tableRows.push(`<tr>${dataRow}</tr>`);
+
+            el.innerHTML = `<table>${tableHeaders}${tableRows}</table>${pagination}`.replace(/,/g, '');
             //Object.keys(item).forEach(function(key){
                 //console.log(key);           
-              el.innerHTML+="<p>"+ item.name + "</p>"; })
+              //el.innerHTML+="<p>"+ item.name + "</p>"; })
     //document.getElementById("data").innerHTML=item.name;
    // document.getElementById("data").innerHTML+="<p>"+ item.name + "</p>";
  });
+});
 }
