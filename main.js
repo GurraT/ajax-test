@@ -46,8 +46,32 @@ xhr.onreadystatechange = function() {
 
 //getData(printDataToConsole);
 
+function getTableHeaders(obj) {
+    var tableHeaders = [];
+
+    Object.keys(obj).forEach(function(key) {
+        tableHeaders.push(`<td>${key}</td>`)
+    });
+
+    return `<tr>${tableHeaders}</tr>`;
+}
+
 function writeToDocument(type){
+    
+     var el = document.getElementById("data");
+         el.innerHTML = "";
+
     getData(type, function(data){
-    document.getElementById("data").innerHTML=data;
-});
+        //console.dir(data);
+        data =  data.results;
+         var tableHeaders = getTableHeaders(data[0]);
+
+        data.forEach(function(item){
+            el.innerHTML = `<table>${tableHeaders}</table>`;
+            //Object.keys(item).forEach(function(key){
+                //console.log(key);           
+              el.innerHTML+="<p>"+ item.name + "</p>"; })
+    //document.getElementById("data").innerHTML=item.name;
+   // document.getElementById("data").innerHTML+="<p>"+ item.name + "</p>";
+ });
 }
